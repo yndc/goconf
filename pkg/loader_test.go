@@ -1,9 +1,9 @@
-package confi
+package recon
 
 import (
 	"testing"
 
-	"github.com/yndc/confi/test/data"
+	"github.com/yndc/recon/test/data"
 )
 
 func TestLoad(t *testing.T) {

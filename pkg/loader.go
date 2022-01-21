@@ -1,4 +1,4 @@
-package confi
+package recon
 
 import (
 	"fmt"

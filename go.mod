@@ -1,4 +1,4 @@
-module github.com/yndc/confi
+module github.com/yndc/recon
 
 go 1.17
 
