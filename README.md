@@ -4,9 +4,21 @@ Short for reactive config. A library for managing and validating configuration f
 
 ## Loaders
 
+`recon` supports loading configuration from different sources. 
+
+### File Loader
+
+### SQL Database
+
+### REST API
+
+## Cache (Optional)
+
+
+
 ## Validation
 
-Available rules
+Available validation rules
 
 #### Numeric validation
 
