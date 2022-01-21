@@ -1,0 +1,15 @@
+string: TestString
+stringWithSpaces: Test String With Spaces
+
+# Some comments
+
+int: 24
+otherInt: "24"
+
+float: 35.2
+otherFloat: "78.323"
+
+port: 8080
+
+ip: 127.0.0.1
+ipPort: 127.0.0.1:8080
