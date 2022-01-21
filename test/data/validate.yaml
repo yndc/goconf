@@ -1,0 +1,77 @@
+# normal string
+string: TestString
+
+# enum
+enum_ok_: OK 
+enum_x__: NotOk
+
+# int with min/max
+intmin10_ok_: 23
+intmin10_ok2: 10
+intmin10_ok3: 902453
+intmin10_x__: 3
+intmin10_x2_: -4
+intmin10_x3_: -214
+intmax30_ok_: 28
+intmax30_ok2: -2345
+intmax30_ok3: 30
+intmax30_x__: 30
+
+# string with min/max length
+strmin3_ok_: abcd
+strmin3_x__: ab
+strmin0_ok_: 
+strmax3_ok_: abc
+strmax3_ok2: 
+strmax3_x__: abcvwd
+strmin3max10_ok_: abcasdf
+strmin3max10_x__: ab
+strmin3max10_x2_: asdfsghdhrsgdsfgdfrggdf
+strmin2max2_ok_: aa
+strmin2max2_x__: aab
+
+# string with format
+
+# ip addresses
+strfmtip_ok_: 192.168.1.1
+strfmtip_ok2: 1.1.1.1
+strfmtip_ok3: 255.255.255.255
+strfmtip_x__: 192.168.1.1.232
+strfmtip_x2_: 192.168.1.1.sc
+strfmtip_x3_: 32rfg
+strfmtipport_ok_: 192.168.1.1:2002
+strfmtipport_ok2: 192.168.1.1
+strfmtipport_x__: 192.168.1.1.24:23
+strfmtipport_x2_: 2002
+strfmtport_ok_: 12345
+strfmtport_ok2: 23423
+strfmtport_ok3: 7000
+strfmtport_ok4: 60000
+strfmtport_x__: 1243x
+strfmtport_x2_: 70000
+strfmtport_x3_: -1
+
+# email addresses
+strfmt_email_ok_: a@a.com
+strfmt_email_ok2: abc.asd.a@dv.org
+strfmt_email_x__: aaa.com
+strfmt_email_x2_: sdgg
+
+# hostnames 
+strhost_ok_: example.com
+strhost_ok2: www.example.com
+strhost_ok3: ayy.lmao.example.com
+strhost_x__: cda-ic@4r#$%
+strhost_x2_: 98
+
+# URL 
+strurl_ok_: http://example.com/mypage.html
+strurl_ok2: ftp://example.com/download.zip
+strurl_ok3: mailto:user@example.com
+strurl_ok4: file:///home/user/file.txt
+strurl_ok5: tel:1-888-555-5555
+strurl_ok6: http://example.com/resource?foo=bar#fragment
+strurl_ok7: /other/link.html
+strurl_x__: asdasd
+strurl_x2_: 34235
+strurl_x3_: example.com
