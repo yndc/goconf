@@ -1,8 +1,32 @@
 package validation
 
-import "reflect"
+const (
+	// Numeric rules
+	RuleNumericMinimum = iota
+	RuleNumericMaximum
+	RuleNumericExclusiveMinimum
+	RuleNumericExclusiveMaximum
 
-type ValidationRule struct {
-	Required bool
-	Type     reflect.Type
+	// String rules
+	RuleStringMinLength
+	RuleStringMaxLength
+	RuleStringPattern
+	RuleStringFormat
+
+	// Array rules
+	RuleArrayMinItems
+	RuleArrayMaxItems
+	RuleArrayUniqueItems
+
+	// Map rules
+	RuleMapMinProperties
+	RuleMapMaxProperties
+	RuleMapRequired
+)
+
+type Rule struct {
+	Type     uint
+	Function int
 }
+
+type ValidationFunction func(value interface{}) error
