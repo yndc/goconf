@@ -1,6 +1,9 @@
 package utils
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 type Path struct {
 	value []string
@@ -26,13 +29,20 @@ func Parse(source string) []string {
 	return nil
 }
 
-func (p *Path) Add(path ...string) {
+func (p *Path) Add(path ...string) *Path {
 	p.value = append(p.value, path...)
+	return p
 }
 
-func (p *Path) Back(count int) {
+func (p *Path) Back(count int) *Path {
 	length := len(p.value)
 	if length >= count && count > 0 {
 		p.value = p.value[:len(p.value)-count]
 	}
+	return p
+}
+
+func (p *Path) String() string {
+	fmt.Println(len(p.value))
+	return strings.Join(p.value, ".")
 }
