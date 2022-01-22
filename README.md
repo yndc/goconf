@@ -56,9 +56,17 @@ Since we can't use the dot character `.` in environment variables, we are using 
 
 By default `recon` will keep a state of the config in the memory, however if a redis connection is given, `recon` will store the state of the config in `redis`.
 
+## Defaults and Optionals
+
+Go struct tags can be used to set a default value for a field. The format is `default:"DEFAULT_VALUE"`. This is only available on primitive types.
+
+All fields are required by default. To allow optional fields, it is required to set the field as a pointer type (`*`).
+
+Arrays are the exception for this behaviour. Arrays can always be empty (as a zero-length array). However it is also possible to add a validation rule to make sure that the array is not empty. See below for the `minItems` rule. 
+
 ## Validation
 
-Available validation rules
+Go struct tags can also be used to add a simple validation over the field values. 
 
 #### Numeric validation
 

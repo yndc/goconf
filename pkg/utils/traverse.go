@@ -6,7 +6,7 @@ import (
 
 type FieldHandler func(path *Path, field reflect.StructField)
 
-func TraverseObject(root interface{}, handler FieldHandler) {
+func TraverseStructType(root interface{}, handler FieldHandler) {
 	var rootType = reflect.TypeOf(root)
 	if rootType.Kind() == reflect.Ptr {
 		rootType = rootType.Elem()

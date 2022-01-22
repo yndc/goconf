@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -17,7 +16,8 @@ func NewPath() *Path {
 
 func (p *Path) Copy() *Path {
 	new := NewPath()
-	copy(p.value, new.value)
+	new.value = make([]string, len(p.value))
+	copy(new.value, p.value)
 	return new
 }
 
@@ -43,6 +43,5 @@ func (p *Path) Back(count int) *Path {
 }
 
 func (p *Path) String() string {
-	fmt.Println(len(p.value))
 	return strings.Join(p.value, ".")
 }

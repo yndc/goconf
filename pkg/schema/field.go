@@ -7,9 +7,11 @@ import (
 	"github.com/yndc/recon/pkg/validation"
 )
 
-type Field struct {
-	path       utils.Path
-	required   bool
-	valueType  reflect.Type
-	validators []validation.ValidationFunction
+type FieldSchema struct {
+	path         *utils.Path
+	array        bool
+	required     bool
+	defaultValue interface{}
+	valueType    reflect.Type
+	validators   []validation.ValidationFunction
 }
