@@ -4,8 +4,8 @@ import (
 	"reflect"
 )
 
-// generateValidators generates an array of validator function based on the given field type
-func generateValidators(fieldType reflect.Type, field reflect.StructField) []ValidationFunction {
+// GenerateValidators generates an array of validator function based on the given field type
+func GenerateValidators(fieldType reflect.Type, field reflect.StructField) []ValidationFunction {
 	validators := make([]ValidationFunction, 0)
 	switch fieldType.Kind() {
 	case reflect.Int:

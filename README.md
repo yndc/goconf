@@ -40,6 +40,23 @@ By default, nested fields can be accessed or defined using the character `.`. So
 
 You can access the deeply nested `"host"` by using `connections.postgres.host`
 
+Arrays can be accessed using the `[INDEX]` format. For example to get the second item from the `connections` array in this configuration:
+```
+{
+    "connections": [
+        {
+            "type": "postgres",
+            "host": "localhost"
+        },
+        {
+            "type": "mysql",
+            "host": "localhost2"
+        }
+    ]
+}
+```
+You can use `connections[1].host`
+
 ### Environment variables mapping
 
 Environment variables are tricky, that's why we can't go with the convention over configuration approach. 
@@ -62,7 +79,9 @@ Go struct tags can be used to set a default value for a field. The format is `de
 
 All fields are required by default. To allow optional fields, it is required to set the field as a pointer type (`*`).
 
-Arrays are the exception for this behaviour. Arrays can always be empty (as a zero-length array). However it is also possible to add a validation rule to make sure that the array is not empty. See below for the `minItems` rule. 
+Composite types such as arrays and structs (nested objects) are the exception for this behaviour. Arrays can always be empty (as a zero-length array). However it is also possible to add a validation rule to make sure that the array is not empty. See below for the `minItems` rule. 
+
+Structs however need to be value types, e.g. it's not possible to have a pointer to struct in the configuration struct definition. To have a struct as an optional, then all of its fields need to be an optional.
 
 ## Validation
 

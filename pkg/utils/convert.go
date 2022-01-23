@@ -59,3 +59,11 @@ func ForceConvertFloat(value string) float64 {
 	}
 	return v
 }
+
+func ForceConvertBool(raw string) bool {
+	v, err := strconv.ParseBool(raw)
+	if err != nil {
+		panic(fmt.Sprintf("unable to force convert to bool: %s", raw))
+	}
+	return v
+}
