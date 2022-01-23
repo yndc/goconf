@@ -21,7 +21,7 @@ func (p *Path) Copy() *Path {
 	return new
 }
 
-func Parse(source string) []string {
+func (p *Path) Parse(source string) []string {
 	splitted := strings.Split(source, ".")
 	if len(splitted) > 0 {
 		return splitted

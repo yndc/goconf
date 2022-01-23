@@ -50,6 +50,7 @@ func (c *Config) loadFromMap(source map[string]interface{}) []error {
 			c.requiredFields.Remove(path.String())
 		}
 	})
+	return errors
 }
 
 func (c *Config) loadValue(value interface{}, path *utils.Path) error {
