@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"fmt"
 	"log"
 	"reflect"
 
@@ -8,12 +9,23 @@ import (
 	"github.com/yndc/recon/pkg/validation"
 )
 
-// GenerateSchema generates a new schema from the given type
-func GenerateSchema(source interface{}) *Schema {
+// NewSchema generates a new schema from the given type
+func NewSchema(root interface{}) (*Schema, error) {
 	schema := &Schema{}
-	schema.fields = make([]FieldSchema, 0)
+	schema.fields = make(map[string]FieldSchema)
 	schema.requiredFields = make([]*utils.Path, 0)
-	utils.TraverseStructType(source, func(path *utils.Path, field reflect.StructField) {
+	rootType := reflect.TypeOf(root)
+	if rootType.Kind() == reflect.Ptr {
+		rootType = rootType.Elem()
+	}
+
+	if rootType.Kind() != reflect.Struct {
+		return nil, fmt.Errorf("root type is not a struct")
+	}
+
+	schema.valueType = rootType
+
+	utils.TraverseStructType(root, func(path *utils.Path, field reflect.StructField) {
 		fieldSchema := FieldSchema{}
 		fieldType := field.Type
 		switch fieldType.Kind() {
@@ -37,8 +49,10 @@ func GenerateSchema(source interface{}) *Schema {
 
 		// generate the validators
 		fieldSchema.validators = validation.GenerateValidators(fieldType, field)
+
+		schema.fields[path.String()] = fieldSchema
 	})
-	return nil
+	return schema, nil
 }
 
 func parseValue(raw string, fieldType reflect.Type) interface{} {

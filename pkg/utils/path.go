@@ -42,6 +42,36 @@ func (p *Path) Back(count int) *Path {
 	return p
 }
 
+func (p *Path) At(i int) string {
+	if i > 0 && i < len(p.value) {
+		return p.value[i]
+	}
+	return ""
+}
+
+func (p *Path) Depth() int {
+	return len(p.value)
+}
+
 func (p *Path) String() string {
 	return strings.Join(p.value, ".")
+}
+
+func (p *Path) Last() string {
+	if len(p.value) > 0 {
+		return p.value[len(p.value)-1]
+	}
+	return ""
+}
+
+func (p *Path) Equals(other *Path) bool {
+	if len(p.value) != len(other.value) {
+		return false
+	}
+	for i, v := range p.value {
+		if other.value[i] != v {
+			return false
+		}
+	}
+	return true
 }

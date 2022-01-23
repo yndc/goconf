@@ -15,3 +15,17 @@ type FieldSchema struct {
 	valueType    reflect.Type
 	validators   []validation.ValidationFunction
 }
+
+func (f *FieldSchema) Validate(value interface{}) error {
+	for _, v := range f.validators {
+		err := v(value)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (f *FieldSchema) GetType() reflect.Type {
+	return f.valueType
+}
