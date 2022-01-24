@@ -9,8 +9,6 @@ import (
 
 type FieldSchema struct {
 	path         *utils.Path
-	array        bool
-	required     bool
 	defaultValue interface{}
 	valueType    reflect.Type
 	validators   []validation.ValidationFunction
@@ -28,4 +26,12 @@ func (f *FieldSchema) Validate(value interface{}) error {
 
 func (f *FieldSchema) GetType() reflect.Type {
 	return f.valueType
+}
+
+func (f *FieldSchema) Required() bool {
+	return f.valueType.Kind() == reflect.Ptr
+}
+
+func (f *FieldSchema) IsArray() bool {
+	return f.valueType.Kind() == reflect.Slice
 }

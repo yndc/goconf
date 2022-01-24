@@ -25,31 +25,24 @@ func NewSchema(root interface{}) (*Schema, error) {
 	schema.valueType = rootType
 
 	utils.TraverseStructType(root, func(path *utils.Path, field reflect.StructField) {
-		fieldSchema := FieldSchema{required: true}
+		fieldSchema := FieldSchema{}
 		fieldType := field.Type
-	loop:
-		for {
-			switch fieldType.Kind() {
-			case reflect.Ptr:
-				fieldSchema.required = false
-				fieldType = field.Type.Elem()
-			case reflect.Slice:
-				fieldSchema.required = false
-				fieldSchema.array = true
-				fieldType = field.Type.Elem()
-				if minItemsStr := field.Tag.Get("minItems"); minItemsStr != "" {
-					minItems := utils.ForceInt64(minItemsStr)
-					if minItems > 0 {
-						fieldSchema.required = true
-					}
+		required := false
+
+		switch fieldType.Kind() {
+		case reflect.Ptr:
+		case reflect.Slice:
+			if minItemsStr := field.Tag.Get("minItems"); minItemsStr != "" {
+				minItems := utils.ForceInt64(minItemsStr)
+				if minItems > 0 {
+					required = true
 				}
-				break loop
-			default:
-				break loop
 			}
+		default:
+			required = true
 		}
 
-		if fieldSchema.required {
+		if required {
 			schema.requiredFields = append(schema.requiredFields, path)
 		}
 

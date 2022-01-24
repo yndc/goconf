@@ -40,11 +40,16 @@ func TraverseMap(root map[string]interface{}, handler ValueHandler) {
 }
 
 func traverseMap(node interface{}, path *Path, handler ValueHandler) {
-	if childMap, ok := node.(map[string]interface{}); ok {
+	switch childMap := node.(type) {
+	case map[string]interface{}:
 		for k, v := range childMap {
 			traverseMap(v, path.Copy().Add(k), handler)
 		}
-	} else {
+	case map[interface{}]interface{}:
+		for k, v := range childMap {
+			traverseMap(v, path.Copy().Add(k.(string)), handler)
+		}
+	default:
 		handler(path, node)
 	}
 }
@@ -53,42 +58,65 @@ func SetStructValue(obj interface{}, path *Path, value interface{}) error {
 	node := reflect.ValueOf(obj)
 
 	for i := 0; i < path.Depth(); i++ {
-		if node.Elem().Type().Kind() != reflect.Struct {
-			return fmt.Errorf("node is not a struct")
+		if node.Kind() == reflect.Ptr {
+			node = node.Elem()
 		}
-		node = node.Elem().FieldByName(path.At(i))
+		if node.Kind() != reflect.Struct {
+			return fmt.Errorf("obj is not a struct")
+		}
+		node = node.FieldByName(path.At(i))
 	}
 
-	switch node.Type().Kind() {
+	SetValue(node, value)
+
+	return nil
+}
+
+func SetValue(dst reflect.Value, data interface{}) error {
+
+	switch dst.Type().Kind() {
+
+	// arrays
+	case reflect.Slice:
+		dataArr := data.([]interface{})
+		slice := reflect.MakeSlice(dst.Type(), len(dataArr), len(dataArr))
+		for i, v := range dataArr {
+			err := SetValue(slice.Index(i), v)
+			if err != nil {
+				return err
+			}
+		}
+		dst.Set(slice)
 
 	// integers
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		node.SetInt(ForceInt64(value))
+		dst.SetInt(ForceInt64(data))
 
 	// unsigned integers
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		switch value.(type) {
+		switch data.(type) {
 		case int, int8, int16, int32, int64:
-			integer := ForceInt64(value)
+			integer := ForceInt64(data)
 			if integer < 0 {
 				return fmt.Errorf("negative integer value for uint destination")
 			}
-			node.SetUint(uint64(integer))
+			dst.SetUint(uint64(integer))
 		default:
-			node.SetUint(ForceUint64(value))
+			dst.SetUint(ForceUint64(data))
 		}
 
 	// floats
 	case reflect.Float32, reflect.Float64:
-		node.SetFloat(ForceFloat64(value))
+		dst.SetFloat(ForceFloat64(data))
 
 	// other primitives
 	case reflect.String:
-		node.SetString(value.(string))
+		dst.SetString(data.(string))
 	case reflect.Bool:
-		node.SetBool(value.(bool))
+		dst.SetBool(data.(bool))
 	default:
 		return fmt.Errorf("unsupported value type")
+
 	}
 
 	return nil

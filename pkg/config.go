@@ -21,13 +21,13 @@ func (c *Config) Get() interface{} {
 }
 
 func (c *Config) LoadMap(source map[string]interface{}) map[string]error {
-	errors := make(map[string]error, 0)
-	utils.TraverseMap(source, func(path *utils.Path, value interface{}) {
-		err := c.loadValue(value, path)
+	errors := make(map[string]error)
+	for k, v := range source {
+		err := c.loadValue(v, utils.Parse(k))
 		if err != nil {
-			errors[path.String()] = err
+			errors[k] = err
 		}
-	})
+	}
 	return errors
 }
 
@@ -43,7 +43,7 @@ func (c *Config) loadValue(value interface{}, at *utils.Path) error {
 	fieldSchema := c.schema.GetFieldSchema(at)
 	if fieldSchema != nil {
 		reflectValue := reflect.ValueOf(value)
-		if !utils.AbleToConvert(reflectValue.Type().Kind(), fieldSchema.GetType().Kind()) {
+		if !utils.AbleToConvert(reflectValue, fieldSchema.GetType()) {
 			return fmt.Errorf("type mismatch, expecting %s received %s", fieldSchema.GetType(), reflectValue.Type())
 		}
 		err := fieldSchema.Validate(value)
@@ -51,7 +51,10 @@ func (c *Config) loadValue(value interface{}, at *utils.Path) error {
 			return err
 		}
 
-		utils.SetStructValue(c.value, at, value)
+		err = utils.SetStructValue(c.value, at, value)
+		if err != nil {
+			return err
+		}
 		c.values[at.String()] = value
 	}
 	return nil

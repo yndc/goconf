@@ -8,24 +8,15 @@ import (
 func GenerateValidators(fieldType reflect.Type, field reflect.StructField) []ValidationFunction {
 	validators := make([]ValidationFunction, 0)
 	switch fieldType.Kind() {
-	case reflect.Int:
-	case reflect.Int8:
-	case reflect.Int16:
-	case reflect.Int32:
-	case reflect.Int64:
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		rule := createIntegerBoundaryRule(fieldType.Kind())
 		rule = rule.Merge(createIntegerBoundaryRuleFromTags(field.Tag))
 		validators = append(validators, rule.CreateValidationFunction())
-	case reflect.Uint:
-	case reflect.Uint8:
-	case reflect.Uint16:
-	case reflect.Uint32:
-	case reflect.Uint64:
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		rule := createUnsignedIntegerBoundaryRule(fieldType.Kind())
 		rule = rule.Merge(createUnsignedIntegerBoundaryRuleFromTags(field.Tag))
 		validators = append(validators, rule.CreateValidationFunction())
-	case reflect.Float32:
-	case reflect.Float64:
+	case reflect.Float32, reflect.Float64:
 		rule := createFloatBoundaryRuleFromTags(field.Tag)
 		validators = append(validators, rule.CreateValidationFunction())
 	case reflect.String:

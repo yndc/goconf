@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 )
 
@@ -17,12 +18,50 @@ func ForceInt64(value interface{}) int64 {
 		return int64(v)
 	case int64:
 		return int64(v)
+	case uint:
+		return int64(v)
+	case uint8:
+		return int64(v)
+	case uint16:
+		return int64(v)
+	case uint32:
+		return int64(v)
+	case uint64:
+		if v > math.MaxInt64 {
+			panic("unable to convert to int64 since the value is larger than int64")
+		}
+		return int64(v)
 	}
 	panic("invalid type to be forced to int64")
 }
 
 func ForceUint64(value interface{}) uint64 {
 	switch v := value.(type) {
+	case int:
+		if v < 0 {
+			panic("unable to convert to uint64 since the value is negative")
+		}
+		return uint64(v)
+	case int8:
+		if v < 0 {
+			panic("unable to convert to uint64 since the value is negative")
+		}
+		return uint64(v)
+	case int16:
+		if v < 0 {
+			panic("unable to convert to uint64 since the value is negative")
+		}
+		return uint64(v)
+	case int32:
+		if v < 0 {
+			panic("unable to convert to uint64 since the value is negative")
+		}
+		return uint64(v)
+	case int64:
+		if v < 0 {
+			panic("unable to convert to uint64 since the value is negative")
+		}
+		return uint64(v)
 	case uint:
 		return uint64(v)
 	case uint8:

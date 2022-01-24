@@ -17,9 +17,52 @@ func StandariseKind(kind reflect.Kind) reflect.Kind {
 	}
 }
 
-func AbleToConvert(original reflect.Kind, destination reflect.Kind) bool {
-	standarisedOriginal := StandariseKind(original)
-	standarisedDestination := StandariseKind(original)
+func GetElemType(val reflect.Value) reflect.Type {
+	node := val
+	for {
+		switch val.Kind() {
+		case reflect.Ptr, reflect.Array, reflect.Interface:
+			node = node.Elem()
+		default:
+			return node.Type()
+		}
+	}
+}
+
+func AbleToConvert(from reflect.Value, to reflect.Type) bool {
+
+	// handle pointers
+	if to.Kind() == reflect.Ptr {
+		to = to.Elem()
+	}
+	if from.Kind() == reflect.Ptr {
+		from = from.Elem()
+	}
+
+	// handle arrays
+	if from.Kind() == reflect.Slice {
+		if from.Len() == 0 {
+			return true
+		}
+		if to.Kind() == reflect.Slice {
+			for i := 0; i < from.Len(); i++ {
+				if !AbleToConvert(from.Index(0), to.Elem()) {
+					return false
+				}
+			}
+			return true
+		} else {
+			return false
+		}
+	}
+
+	// handle interfaces
+	if from.Kind() == reflect.Interface {
+		from = from.Elem()
+	}
+
+	standarisedOriginal := StandariseKind(from.Kind())
+	standarisedDestination := StandariseKind(to.Kind())
 	if standarisedOriginal == standarisedDestination {
 		return true
 	}

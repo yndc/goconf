@@ -17,11 +17,11 @@ func NewPath() *Path {
 func Parse(source string) *Path {
 	path := NewPath()
 	splitted := strings.Split(source, ".")
-	if len(splitted) > 0 {
+	if len(splitted) == 0 {
 		return nil
 	}
 	path.value = splitted
-	return nil
+	return path
 }
 
 func (p *Path) Copy() *Path {
