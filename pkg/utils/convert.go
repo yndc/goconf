@@ -7,9 +7,14 @@ import (
 
 func ForceInt64(value interface{}) int64 {
 	switch v := value.(type) {
+	case int:
+		return int64(v)
 	case int8:
+		return int64(v)
 	case int16:
+		return int64(v)
 	case int32:
+		return int64(v)
 	case int64:
 		return int64(v)
 	}
@@ -18,9 +23,14 @@ func ForceInt64(value interface{}) int64 {
 
 func ForceUint64(value interface{}) uint64 {
 	switch v := value.(type) {
+	case uint:
+		return uint64(v)
 	case uint8:
+		return uint64(v)
 	case uint16:
+		return uint64(v)
 	case uint32:
+		return uint64(v)
 	case uint64:
 		return uint64(v)
 	}
@@ -30,6 +40,7 @@ func ForceUint64(value interface{}) uint64 {
 func ForceFloat64(value interface{}) float64 {
 	switch v := value.(type) {
 	case float32:
+		return float64(v)
 	case float64:
 		return float64(v)
 	}

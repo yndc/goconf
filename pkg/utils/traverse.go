@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"reflect"
 )
 
@@ -48,35 +49,47 @@ func traverseMap(node interface{}, path *Path, handler ValueHandler) {
 	}
 }
 
-func SetStructValue(root reflect.Value, path *Path, value interface{}) {
-	node := root
+func SetStructValue(obj interface{}, path *Path, value interface{}) error {
+	node := reflect.ValueOf(obj)
+
 	for i := 0; i < path.Depth(); i++ {
-		if node.Type().Kind() != reflect.Struct {
-			panic("node is not a struct")
+		if node.Elem().Type().Kind() != reflect.Struct {
+			return fmt.Errorf("node is not a struct")
 		}
-		node = node.FieldByName(path.At(i))
+		node = node.Elem().FieldByName(path.At(i))
 	}
+
 	switch node.Type().Kind() {
-	case reflect.Int:
-	case reflect.Int8:
-	case reflect.Int16:
-	case reflect.Int32:
-	case reflect.Int64:
-		node.SetInt(value.(int64))
-	case reflect.Uint:
-	case reflect.Uint8:
-	case reflect.Uint16:
-	case reflect.Uint32:
-	case reflect.Uint64:
-		node.SetUint(value.(uint64))
-	case reflect.Float32:
-	case reflect.Float64:
-		node.SetFloat(value.(float64))
+
+	// integers
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		node.SetInt(ForceInt64(value))
+
+	// unsigned integers
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		switch value.(type) {
+		case int, int8, int16, int32, int64:
+			integer := ForceInt64(value)
+			if integer < 0 {
+				return fmt.Errorf("negative integer value for uint destination")
+			}
+			node.SetUint(uint64(integer))
+		default:
+			node.SetUint(ForceUint64(value))
+		}
+
+	// floats
+	case reflect.Float32, reflect.Float64:
+		node.SetFloat(ForceFloat64(value))
+
+	// other primitives
 	case reflect.String:
 		node.SetString(value.(string))
 	case reflect.Bool:
 		node.SetBool(value.(bool))
 	default:
-		panic("unsupported value type")
+		return fmt.Errorf("unsupported value type")
 	}
+
+	return nil
 }

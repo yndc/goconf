@@ -14,19 +14,21 @@ func NewPath() *Path {
 	}
 }
 
+func Parse(source string) *Path {
+	path := NewPath()
+	splitted := strings.Split(source, ".")
+	if len(splitted) > 0 {
+		return nil
+	}
+	path.value = splitted
+	return nil
+}
+
 func (p *Path) Copy() *Path {
 	new := NewPath()
 	new.value = make([]string, len(p.value))
 	copy(new.value, p.value)
 	return new
-}
-
-func (p *Path) Parse(source string) []string {
-	splitted := strings.Split(source, ".")
-	if len(splitted) > 0 {
-		return splitted
-	}
-	return nil
 }
 
 func (p *Path) Add(path ...string) *Path {
@@ -43,7 +45,7 @@ func (p *Path) Back(count int) *Path {
 }
 
 func (p *Path) At(i int) string {
-	if i > 0 && i < len(p.value) {
+	if i >= 0 && i < len(p.value) {
 		return p.value[i]
 	}
 	return ""

@@ -10,54 +10,40 @@ import (
 
 // Config is the configuration container
 type Config struct {
-	value          interface{}
-	values         map[string]interface{}
-	schema         schema.Schema
-	requiredFields *utils.Set
+	value  interface{}
+	values map[string]interface{}
+	schema schema.Schema
 }
 
-func New(configStruct interface{}) (*Config, error) {
-	schema, err := schema.NewSchema(configStruct)
-	if err != nil {
-		return nil, err
-	}
-	return &Config{
-		schema:         *schema,
-		value:          reflect.New(schema.GetType()),
-		requiredFields: utils.NewSetWithValues(schema.GetRequiredFieldString()...),
-		values:         make(map[string]interface{}),
-	}, nil
-}
-
-// Get a copy of the whole configuration object
+// Get the configuration object
 func (c *Config) Get() interface{} {
 	return c.value
 }
 
-func (c *Config) initializeValue() {
-	if c.value == nil {
-		c.value = reflect.New(c.schema.GetType())
-	}
-}
-
-func (c *Config) loadFromMap(source map[string]interface{}) []error {
-	errors := make([]error, 0)
+func (c *Config) LoadMap(source map[string]interface{}) map[string]error {
+	errors := make(map[string]error, 0)
 	utils.TraverseMap(source, func(path *utils.Path, value interface{}) {
 		err := c.loadValue(value, path)
 		if err != nil {
-			errors = append(errors, err)
-		} else {
-			c.requiredFields.Remove(path.String())
+			errors[path.String()] = err
 		}
 	})
 	return errors
 }
 
-func (c *Config) loadValue(value interface{}, path *utils.Path) error {
-	fieldSchema := c.schema.GetFieldSchema(path)
+func (c *Config) LoadValue(key string, value interface{}) error {
+	p := utils.Parse(key)
+	if p != nil {
+		return c.loadValue(value, p)
+	}
+	return fmt.Errorf("key not found")
+}
+
+func (c *Config) loadValue(value interface{}, at *utils.Path) error {
+	fieldSchema := c.schema.GetFieldSchema(at)
 	if fieldSchema != nil {
 		reflectValue := reflect.ValueOf(value)
-		if reflectValue.Type().Kind() != fieldSchema.GetType().Kind() {
+		if !utils.AbleToConvert(reflectValue.Type().Kind(), fieldSchema.GetType().Kind()) {
 			return fmt.Errorf("type mismatch, expecting %s received %s", fieldSchema.GetType(), reflectValue.Type())
 		}
 		err := fieldSchema.Validate(value)
@@ -65,7 +51,8 @@ func (c *Config) loadValue(value interface{}, path *utils.Path) error {
 			return err
 		}
 
-		utils.SetStructValue(reflect.ValueOf(c.value), path, value)
+		utils.SetStructValue(c.value, at, value)
+		c.values[at.String()] = value
 	}
 	return nil
 }

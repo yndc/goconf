@@ -12,8 +12,6 @@ type Types struct {
 	UInt64  uint64
 	Int     int
 	UInt    uint
-	Rune    rune
-	Byte    byte
 	Float32 float32
 	Float64 float64
 	IntPtr  *int
@@ -28,16 +26,12 @@ type Types struct {
 	BoolPtr *bool
 
 	// structs
-	Struct    Struct
-	StructPtr *Struct
+	Struct Struct
 
 	// arrays
-	IntArray       []int
-	StringArray    []string
-	StructArray    []Struct
-	IntPtrArray    []*int
-	StringPtrArray []*string
-	StructPtrArray []*Struct
+	IntArray    []int
+	StringArray []string
+	StructArray []Struct
 }
 
 type Struct struct {
