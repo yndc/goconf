@@ -6,6 +6,11 @@ import (
 	"github.com/yndc/recon/pkg/utils"
 )
 
+// Get the configuration object
+func (c *Config) Get() interface{} {
+	return c.value
+}
+
 func (c *Config) GetInt(key string) int64 {
 	return c.values[key].(int64)
 }

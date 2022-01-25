@@ -12,7 +12,7 @@ Float32: 23452.87
 Float64: 457656865.32535
 String: dfdfhdgh
 Bool: true
-BoolPtr: false
+BoolPtr: true
 Struct: 
   One: ayy
   Two: hhh

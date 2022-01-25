@@ -10,9 +10,8 @@ import (
 )
 
 type FileLoader struct {
-	path              string
-	valuesHandler     ValuesHandler
-	onValidationError func(key string, value interface{}, err error)
+	path          string
+	valuesHandler ValuesHandler
 }
 
 func NewFileLoader(path string, valuesHandler ValuesHandler) *FileLoader {
