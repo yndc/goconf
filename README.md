@@ -2,6 +2,28 @@
 
 Short for reactive config. A library for managing and validating configuration files for Go. Supports loading configuration from files (JSON and YAML), SQL database, and REST API endpoints. Supports caching with redis.
 
+## Usage
+
+Use the builder to prepare a new config instance. 
+
+Example config struct:
+```
+type Config struct {
+    DatabaseConnection string 
+    Port: int
+    Peers: []string
+}
+
+Example loading from `config.yaml` 
+```
+DatabaseConnection: postgresql://postgres:password@localhost:5432/database
+Port: 8080
+Peers: 
+  -  192.168.1.2
+  -  192.168.1.3
+```
+```
+
 ## Loaders
 
 `recon` supports loading configuration from different sources. 

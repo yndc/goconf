@@ -12,17 +12,22 @@ import (
 type FileLoader struct {
 	path          string
 	valuesHandler ValuesHandler
+	keyMapper     KeyMapper
 }
 
-func NewFileLoader(path string, valuesHandler ValuesHandler) *FileLoader {
+func NewFileLoader(path string, mapper KeyMapper, valuesHandler ValuesHandler) *FileLoader {
+	if mapper == nil {
+		mapper = DefaultMapper
+	}
 	return &FileLoader{
 		path:          path,
 		valuesHandler: valuesHandler,
+		keyMapper:     mapper,
 	}
 }
 
 func (l FileLoader) Load() error {
-	values, err := loadFileToMap(l.path)
+	values, err := l.loadFileToMap(l.path)
 	if err != nil {
 		return err
 	}
@@ -30,7 +35,7 @@ func (l FileLoader) Load() error {
 	return nil
 }
 
-func loadFileToMap(path string) (map[string]interface{}, error) {
+func (l FileLoader) loadFileToMap(path string) (map[string]interface{}, error) {
 	raw, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
@@ -39,15 +44,15 @@ func loadFileToMap(path string) (map[string]interface{}, error) {
 	ext := getFileExtension(path)
 	switch ext {
 	case "yaml", "yml":
-		return loadYaml(raw)
+		return l.loadYaml(raw)
 	case "json":
-		return loadJson(raw)
+		return l.loadJson(raw)
 	}
 
 	return nil, fmt.Errorf("unsupported file format: %s", ext)
 }
 
-func loadYaml(source []byte) (map[string]interface{}, error) {
+func (l FileLoader) loadYaml(source []byte) (map[string]interface{}, error) {
 	var values map[string]interface{}
 	err := yaml.Unmarshal(source, &values)
 	if err != nil {
@@ -55,12 +60,12 @@ func loadYaml(source []byte) (map[string]interface{}, error) {
 	}
 	result := make(map[string]interface{}, len(values))
 	utils.TraverseMap(values, func(path *utils.Path, value interface{}) {
-		result[path.String()] = value
+		result[path.Map(l.keyMapper).String()] = value
 	})
 	return result, err
 }
 
-func loadJson(source []byte) (map[string]interface{}, error) {
+func (l FileLoader) loadJson(source []byte) (map[string]interface{}, error) {
 	var result map[string]interface{}
 	err := yaml.Unmarshal(source, &result)
 	return result, err

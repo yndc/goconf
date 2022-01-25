@@ -59,6 +59,15 @@ func (p *Path) String() string {
 	return strings.Join(p.value, ".")
 }
 
+func (p *Path) Map(m func(string) string) *Path {
+	newValues := make([]string, len(p.value))
+	for i, v := range p.value {
+		newValues[i] = m(v)
+	}
+	p.value = newValues
+	return p
+}
+
 func (p *Path) Last() string {
 	if len(p.value) > 0 {
 		return p.value[len(p.value)-1]

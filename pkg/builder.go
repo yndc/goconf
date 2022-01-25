@@ -27,8 +27,8 @@ func New(sample interface{}) *Builder {
 }
 
 // add a file loader to the config builder
-func (b *Builder) FromFile(path string) *Builder {
-	b.loaders = append(b.loaders, NewFileLoader(path, b.config.LoadMap))
+func (b *Builder) FromFile(path string, mapper KeyMapper) *Builder {
+	b.loaders = append(b.loaders, NewFileLoader(path, mapper, b.config.LoadMap))
 	return b
 }
 
