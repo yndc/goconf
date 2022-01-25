@@ -76,10 +76,18 @@ func (b *IntBoundaryRule) CreateValidationFunction() ValidationFunction {
 
 func (b *IntBoundaryRule) Merge(o IntBoundaryRule) IntBoundaryRule {
 	new := IntBoundaryRule{}
-	new.SetMin(b.Min, b.Flags.Has(NumericBoundaryExclusiveMin))
-	new.SetMax(b.Max, b.Flags.Has(NumericBoundaryExclusiveMax))
-	new.SetMin(b.Min, o.Flags.Has(NumericBoundaryExclusiveMin))
-	new.SetMax(b.Max, o.Flags.Has(NumericBoundaryExclusiveMax))
+	if b.Flags.Has(NumericBoundaryMin) {
+		new.SetMin(b.Min, b.Flags.Has(NumericBoundaryExclusiveMin))
+	}
+	if b.Flags.Has(NumericBoundaryMax) {
+		new.SetMax(b.Max, b.Flags.Has(NumericBoundaryExclusiveMax))
+	}
+	if o.Flags.Has(NumericBoundaryMin) {
+		new.SetMin(o.Min, o.Flags.Has(NumericBoundaryExclusiveMin))
+	}
+	if o.Flags.Has(NumericBoundaryMax) {
+		new.SetMax(o.Max, o.Flags.Has(NumericBoundaryExclusiveMax))
+	}
 	return new
 }
 
@@ -144,10 +152,18 @@ func (b *UintBoundaryRule) CreateValidationFunction() ValidationFunction {
 
 func (b *UintBoundaryRule) Merge(o UintBoundaryRule) UintBoundaryRule {
 	new := UintBoundaryRule{}
-	new.SetMin(b.Min, b.Flags.Has(NumericBoundaryExclusiveMin))
-	new.SetMax(b.Max, b.Flags.Has(NumericBoundaryExclusiveMax))
-	new.SetMin(b.Min, o.Flags.Has(NumericBoundaryExclusiveMin))
-	new.SetMax(b.Max, o.Flags.Has(NumericBoundaryExclusiveMax))
+	if b.Flags.Has(NumericBoundaryMin) {
+		new.SetMin(b.Min, b.Flags.Has(NumericBoundaryExclusiveMin))
+	}
+	if b.Flags.Has(NumericBoundaryMax) {
+		new.SetMax(b.Max, b.Flags.Has(NumericBoundaryExclusiveMax))
+	}
+	if o.Flags.Has(NumericBoundaryMin) {
+		new.SetMin(o.Min, o.Flags.Has(NumericBoundaryExclusiveMin))
+	}
+	if o.Flags.Has(NumericBoundaryMax) {
+		new.SetMax(o.Max, o.Flags.Has(NumericBoundaryExclusiveMax))
+	}
 	return new
 }
 
@@ -212,10 +228,18 @@ func (b *FloatBoundaryRule) CreateValidationFunction() ValidationFunction {
 
 func (b *FloatBoundaryRule) Merge(o FloatBoundaryRule) FloatBoundaryRule {
 	new := FloatBoundaryRule{}
-	new.SetMin(b.Min, b.Flags.Has(NumericBoundaryExclusiveMin))
-	new.SetMax(b.Max, b.Flags.Has(NumericBoundaryExclusiveMax))
-	new.SetMin(b.Min, o.Flags.Has(NumericBoundaryExclusiveMin))
-	new.SetMax(b.Max, o.Flags.Has(NumericBoundaryExclusiveMax))
+	if b.Flags.Has(NumericBoundaryMin) {
+		new.SetMin(b.Min, b.Flags.Has(NumericBoundaryExclusiveMin))
+	}
+	if b.Flags.Has(NumericBoundaryMax) {
+		new.SetMax(b.Max, b.Flags.Has(NumericBoundaryExclusiveMax))
+	}
+	if o.Flags.Has(NumericBoundaryMin) {
+		new.SetMin(o.Min, o.Flags.Has(NumericBoundaryExclusiveMin))
+	}
+	if o.Flags.Has(NumericBoundaryMax) {
+		new.SetMax(o.Max, o.Flags.Has(NumericBoundaryExclusiveMax))
+	}
 	return new
 }
 

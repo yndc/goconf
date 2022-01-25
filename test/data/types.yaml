@@ -1,33 +1,33 @@
-# Int8: 24
-# Int16: 3145
-# Int32: 1353523
-# Int64: -235223456
-# UInt8: 213
-# UInt16: 34
-# UInt32: 1233
-# UInt64: 55434
-# Int: -152668
-# UInt: 87
-# Float32: 23452.87
-# Float64: 457656865.32535
-# String: dfdfhdgh
-# Bool: true
-# BoolPtr: false
+Int8: 24
+Int16: 3145
+Int32: 1353523
+Int64: -235223456
+UInt8: 213
+UInt16: 34
+UInt32: 1233
+UInt64: 55434
+Int: -152668
+UInt: 87
+Float32: 23452.87
+Float64: 457656865.32535
+String: dfdfhdgh
+Bool: true
+BoolPtr: false
 Struct: 
   One: ayy
   Two: hhh
   
-# IntArray: 
-#   - 1
-#   - 5
-#   - 6
+IntArray: 
+  - 1
+  - 5
+  - 6
 
-# StringArray: 
-#   - ayy 
-#   - lmao
+StringArray: 
+  - ayy 
+  - lmao
 
-# StructArray:
-#   - One: firstt
-#     Two: fir
-#   - One: secondd
-#     Two: secc
+StructArray:
+  - One: firstt
+    Two: fir
+  - One: secondd
+    Two: secc

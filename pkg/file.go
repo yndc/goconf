@@ -5,15 +5,14 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/rs/zerolog"
 	"github.com/yndc/recon/pkg/utils"
 	"gopkg.in/yaml.v2"
 )
 
 type FileLoader struct {
-	path          string
-	valuesHandler ValuesHandler
-	logger        zerolog.Logger
+	path              string
+	valuesHandler     ValuesHandler
+	onValidationError func(key string, value interface{}, err error)
 }
 
 func NewFileLoader(path string, valuesHandler ValuesHandler) *FileLoader {
@@ -28,11 +27,7 @@ func (l FileLoader) Load() error {
 	if err != nil {
 		return err
 	}
-	validationErrors := l.valuesHandler(values)
-	for k, v := range validationErrors {
-		// l.logger.Err(v).Msgf("config validation error for key %s", k)
-		fmt.Println("config validation error for key", k, ":", v)
-	}
+	l.valuesHandler(values)
 	return nil
 }
 

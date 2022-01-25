@@ -1,6 +1,7 @@
 package recon_test
 
 import (
+	"fmt"
 	"testing"
 
 	recon "github.com/yndc/recon/pkg"
@@ -8,11 +9,20 @@ import (
 )
 
 func TestBuilder(t *testing.T) {
-	builder := recon.New(&data.Types{}).FromFile("../test/data/types.yaml")
+	builder := recon.New(&data.Types{})
+	builder.FromFile("../test/data/types.yaml")
+	builder.OnLoaded(func(key string, value interface{}) {
+		fmt.Printf("loaded %s: %s\n", key, value)
+	})
+	builder.OnValidationError(func(key string, value interface{}, err error) {
+		fmt.Printf("validation error %s: %s\n", key, value)
+	})
+
 	config, err := builder.Build()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	config.Get()
+	c := config.Get()
+	fmt.Println(c)
 }

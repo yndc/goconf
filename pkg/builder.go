@@ -9,9 +9,10 @@ import (
 )
 
 type Builder struct {
-	loaders []Loader
-	config  *Config
-	errors  map[string]error
+	loaders           []Loader
+	config            *Config
+	onValidationError func(key string, value interface{}, err error)
+	onLoaded          func(key string, value interface{})
 }
 
 // create a new config builder
@@ -39,6 +40,14 @@ func (b *Builder) Build() (*Config, error) {
 		return nil, err
 	}
 	b.config.schema = *schema
+
+	// add hooks to the loaders
+	if b.onValidationError == nil {
+		b.onValidationError = func(key string, value interface{}, err error) {}
+	}
+	if b.onLoaded == nil {
+		b.onLoaded = func(key string, value interface{}) {}
+	}
 
 	// load all values from all loaders
 	for _, loader := range b.loaders {
