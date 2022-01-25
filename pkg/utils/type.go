@@ -61,6 +61,31 @@ func AbleToConvert(from reflect.Value, to reflect.Type) bool {
 		from = from.Elem()
 	}
 
+	// handle maps
+	if from.Kind() == reflect.Map {
+		if to.Kind() == reflect.Map {
+			return true
+		}
+		if to.Kind() != reflect.Struct {
+			return false
+		}
+
+		iter := from.MapRange()
+		for iter.Next() {
+			k := iter.Key()
+			v := iter.Value()
+			if k.Kind() == reflect.String {
+				name := k.Interface().(string)
+				if toField, ok := to.FieldByName(name); ok {
+					if !AbleToConvert(v, toField.Type) {
+						return false
+					}
+				}
+			}
+		}
+		return true
+	}
+
 	standarisedOriginal := StandariseKind(from.Kind())
 	standarisedDestination := StandariseKind(to.Kind())
 	if standarisedOriginal == standarisedDestination {

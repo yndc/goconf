@@ -111,8 +111,39 @@ func SetValue(dst reflect.Value, data interface{}) error {
 			if err != nil {
 				return err
 			}
+			fmt.Println(slice.Index(i))
 		}
 		dst.Set(slice)
+		fmt.Println(slice)
+
+	// structs
+	case reflect.Struct:
+		dataVal := reflect.ValueOf(data)
+		if dataVal.Kind() == reflect.Map {
+			iter := dataVal.MapRange()
+			for iter.Next() {
+				k := iter.Key()
+				v := iter.Value()
+				if k.Kind() == reflect.Interface {
+					k = k.Elem()
+				}
+				if v.Kind() == reflect.Interface {
+					v = v.Elem()
+				}
+				if k.Kind() == reflect.String {
+					name := k.Interface().(string)
+					dstField := dst.FieldByName(name)
+					err := SetValue(dstField, v.Interface())
+					if err != nil {
+						return err
+					}
+				}
+			}
+		} else if dataVal.Kind() == reflect.Struct {
+			if dataVal.Type() == dst.Type() && dst.CanSet() {
+				dst.Set(dataVal)
+			}
+		}
 
 	// integers
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:

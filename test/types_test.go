@@ -1,4 +1,4 @@
-package recon_test
+package test
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 
 func TestBuilder(t *testing.T) {
 	builder := recon.New(&data.Types{})
-	builder.FromFile("../test/data/types.yaml", recon.CamelCaseMapper)
+	builder.FromFile("./data/types.yaml", recon.CamelCaseMapper)
 	builder.OnLoaded(func(key string, value interface{}) {
 		fmt.Printf("loaded %s: %v\n", key, value)
 	})
