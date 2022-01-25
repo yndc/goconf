@@ -6,11 +6,14 @@ UInt8: 213
 UInt16: 34
 UInt32: 1233
 UInt64: 55434
+UIntPtr: 3225
 Int: -152668
+IntPtr: -35
 UInt: 87
 Float32: 23452.87
 Float64: 457656865.32535
 String: dfdfhdgh
+StringPtr: xv
 Bool: true
 BoolPtr: true
 Struct: 

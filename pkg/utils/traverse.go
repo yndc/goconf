@@ -54,7 +54,7 @@ func traverseMap(node interface{}, path *Path, handler ValueHandler) {
 	}
 }
 
-func SetStructValue(obj interface{}, path *Path, value interface{}) error {
+func GetStructValue(obj interface{}, path *Path) (reflect.Value, error) {
 	node := reflect.ValueOf(obj)
 
 	for i := 0; i < path.Depth(); i++ {
@@ -62,26 +62,52 @@ func SetStructValue(obj interface{}, path *Path, value interface{}) error {
 			node = node.Elem()
 		}
 		if node.Kind() != reflect.Struct {
-			return fmt.Errorf("obj is not a struct")
+			return reflect.Value{}, fmt.Errorf("obj is not a struct")
 		}
 		node = node.FieldByName(path.At(i))
 	}
 
-	SetValue(node, value)
+	return node, nil
+}
 
-	return nil
+func SetStructValue(obj interface{}, path *Path, value interface{}) error {
+	node, err := GetStructValue(obj, path)
+	if err != nil {
+		return err
+	}
+
+	return SetValue(node, value)
 }
 
 func SetValue(dst reflect.Value, data interface{}) error {
 
-	switch dst.Type().Kind() {
+	// deref data if it's a pointer
+	dataVal := reflect.ValueOf(data)
+	if dataVal.Kind() == reflect.Ptr {
+		if dataVal.IsNil() {
+			return nil
+		}
+		data = dataVal.Elem().Interface()
+	}
+
+	switch dst.Kind() {
+
+	// pointers
+	case reflect.Ptr:
+		temp := reflect.New(dst.Type().Elem())
+		err := SetValue(temp.Elem(), data)
+		if err != nil {
+			return err
+		}
+
+		dst.Set(temp)
 
 	// arrays
 	case reflect.Slice:
-		dataArr := data.([]interface{})
-		slice := reflect.MakeSlice(dst.Type(), len(dataArr), len(dataArr))
-		for i, v := range dataArr {
-			err := SetValue(slice.Index(i), v)
+		dataVal := reflect.ValueOf(data)
+		slice := reflect.MakeSlice(dst.Type(), dataVal.Len(), dataVal.Len())
+		for i := 0; i < dataVal.Len(); i++ {
+			err := SetValue(slice.Index(i), dataVal.Index(i).Interface())
 			if err != nil {
 				return err
 			}
@@ -113,11 +139,27 @@ func SetValue(dst reflect.Value, data interface{}) error {
 	case reflect.String:
 		dst.SetString(data.(string))
 	case reflect.Bool:
-		dst.SetBool(data.(bool))
+		dst.Set(reflect.ValueOf(data.(bool)))
 	default:
 		return fmt.Errorf("unsupported value type")
-
 	}
 
 	return nil
+}
+
+func wrapInt(kind reflect.Kind, value int64) reflect.Value {
+	switch kind {
+	case reflect.Int:
+		v := int(value)
+		return reflect.ValueOf(&v)
+	case reflect.Int8:
+		return reflect.ValueOf(int8(value))
+	case reflect.Int16:
+		return reflect.ValueOf(int16(value))
+	case reflect.Int32:
+		return reflect.ValueOf(int32(value))
+	case reflect.Int64:
+		return reflect.ValueOf(int64(value))
+	}
+	return reflect.Value{}
 }

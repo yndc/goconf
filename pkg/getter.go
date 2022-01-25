@@ -2,13 +2,23 @@ package recon
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/yndc/recon/pkg/utils"
 )
 
-// Get the configuration object
+// Get a copy of the configuration object
 func (c *Config) Get() interface{} {
-	return c.value
+	v := reflect.ValueOf(c.value).Elem()
+	n := reflect.New(v.Type())
+	utils.TraverseStructType(c.value, func(path *utils.Path, field reflect.StructField) {
+		d, err := utils.GetStructValue(c.value, path)
+		if err != nil {
+			return
+		}
+		utils.SetStructValue(n.Interface(), path, d.Interface())
+	})
+	return n.Interface()
 }
 
 func (c *Config) GetInt(key string) int64 {

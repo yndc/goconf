@@ -15,7 +15,7 @@ func TestBuilder(t *testing.T) {
 		fmt.Printf("loaded %s: %v\n", key, value)
 	})
 	builder.OnValidationError(func(key string, value interface{}, err error) {
-		fmt.Printf("validation error %s: %s\n", key, value)
+		fmt.Printf("validation error %s with value %v: %v\n", key, value, err)
 	})
 
 	config, err := builder.Build()

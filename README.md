@@ -13,6 +13,7 @@ type Config struct {
     Port: int
     Peers: []string
 }
+```
 
 Example loading from `config.yaml` 
 ```
@@ -22,6 +23,21 @@ Peers:
   -  192.168.1.2
   -  192.168.1.3
 ```
+
+Example usage: 
+```
+    // create a new builder, use a file loader on it
+    builder := recon.New(&Config{})
+	builder.FromFile("./config.yaml", recon.CamelCaseMapper)
+
+    // build the config, this will also do the initial load on the sourced config
+	config, err := builder.Build()
+	if err != nil {
+		panic(err)
+	}
+
+    // get the loaded config value as type Config
+	c := config.Get().(Type)
 ```
 
 ## Loaders
