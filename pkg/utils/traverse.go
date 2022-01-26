@@ -70,22 +70,24 @@ func GetStructValue(obj interface{}, path *Path) (reflect.Value, error) {
 	return node, nil
 }
 
-func SetStructValue(obj interface{}, path *Path, value interface{}) error {
+func SetStructValue(obj interface{}, path *Path, value interface{}) (interface{}, error) {
 	node, err := GetStructValue(obj, path)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	return SetValue(node, value)
 }
 
-func SetValue(dst reflect.Value, data interface{}) error {
+func SetValue(dst reflect.Value, data interface{}) (interface{}, error) {
+
+	var finalValue interface{}
 
 	// deref data if it's a pointer
 	dataVal := reflect.ValueOf(data)
 	if dataVal.Kind() == reflect.Ptr {
 		if dataVal.IsNil() {
-			return nil
+			return nil, nil
 		}
 		data = dataVal.Elem().Interface()
 	}
@@ -95,26 +97,27 @@ func SetValue(dst reflect.Value, data interface{}) error {
 	// pointers
 	case reflect.Ptr:
 		temp := reflect.New(dst.Type().Elem())
-		err := SetValue(temp.Elem(), data)
+		_, err := SetValue(temp.Elem(), data)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		dst.Set(temp)
+		finalValue = temp.Interface()
 
 	// arrays
 	case reflect.Slice:
 		dataVal := reflect.ValueOf(data)
 		slice := reflect.MakeSlice(dst.Type(), dataVal.Len(), dataVal.Len())
 		for i := 0; i < dataVal.Len(); i++ {
-			err := SetValue(slice.Index(i), dataVal.Index(i).Interface())
+			_, err := SetValue(slice.Index(i), dataVal.Index(i).Interface())
 			if err != nil {
-				return err
+				return nil, err
 			}
 			fmt.Println(slice.Index(i))
 		}
 		dst.Set(slice)
-		fmt.Println(slice)
+		finalValue = slice.Interface()
 
 	// structs
 	case reflect.Struct:
@@ -133,21 +136,25 @@ func SetValue(dst reflect.Value, data interface{}) error {
 				if k.Kind() == reflect.String {
 					name := k.Interface().(string)
 					dstField := dst.FieldByName(name)
-					err := SetValue(dstField, v.Interface())
+					_, err := SetValue(dstField, v.Interface())
 					if err != nil {
-						return err
+						return nil, err
 					}
 				}
 			}
+			finalValue = dst.Interface()
 		} else if dataVal.Kind() == reflect.Struct {
 			if dataVal.Type() == dst.Type() && dst.CanSet() {
 				dst.Set(dataVal)
+				finalValue = dataVal.Interface()
 			}
 		}
 
 	// integers
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		dst.SetInt(ForceInt64(data))
+		v := ForceInt64(data)
+		dst.SetInt(v)
+		finalValue = v
 
 	// unsigned integers
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
@@ -155,27 +162,36 @@ func SetValue(dst reflect.Value, data interface{}) error {
 		case int, int8, int16, int32, int64:
 			integer := ForceInt64(data)
 			if integer < 0 {
-				return fmt.Errorf("negative integer value for uint destination")
+				return nil, fmt.Errorf("negative integer value for uint destination")
 			}
 			dst.SetUint(uint64(integer))
+			finalValue = uint64(integer)
 		default:
-			dst.SetUint(ForceUint64(data))
+			v := ForceUint64(data)
+			dst.SetUint(v)
+			finalValue = v
 		}
 
 	// floats
 	case reflect.Float32, reflect.Float64:
-		dst.SetFloat(ForceFloat64(data))
+		v := ForceFloat64(data)
+		dst.SetFloat(v)
+		finalValue = v
 
 	// other primitives
 	case reflect.String:
-		dst.SetString(data.(string))
+		v := data.(string)
+		dst.SetString(v)
+		finalValue = v
 	case reflect.Bool:
-		dst.Set(reflect.ValueOf(data.(bool)))
+		v := data.(bool)
+		dst.SetBool(v)
+		finalValue = v
 	default:
-		return fmt.Errorf("unsupported value type")
+		return nil, fmt.Errorf("unsupported value type")
 	}
 
-	return nil
+	return finalValue, nil
 }
 
 func wrapInt(kind reflect.Kind, value int64) reflect.Value {

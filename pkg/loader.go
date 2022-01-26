@@ -50,11 +50,11 @@ func (c *Config) loadValue(value interface{}, at *utils.Path) error {
 			return c.handleLoadError(key, value, err)
 		}
 
-		err = utils.SetStructValue(c.value, at, value)
+		value, err = utils.SetStructValue(c.value, at, value)
 		if err != nil {
 			return c.handleLoadError(key, value, err)
 		}
-		c.values[at.String()] = value
+		c.values[at.String()] = unwrapPtr(value)
 		c.handleLoad(key, value)
 	}
 	return nil
@@ -71,4 +71,12 @@ func (c *Config) handleLoad(key string, value interface{}) {
 	if c.onLoaded != nil {
 		c.onLoaded(key, value)
 	}
+}
+
+func unwrapPtr(v interface{}) interface{} {
+	val := reflect.ValueOf(v)
+	if val.Kind() == reflect.Ptr {
+		return val.Elem().Interface()
+	}
+	return v
 }
