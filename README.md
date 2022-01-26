@@ -36,8 +36,13 @@ Example usage:
 		panic(err)
 	}
 
-    // get the loaded config value as type Config
-	c := config.Get().(Type)
+	// get the loaded config value object
+	c := config.Get().(*Config)
+    fmt.Println(c)
+
+    // get field value
+    dbConn := config.GetString("DatabaseConnection")
+    fmt.Println(dbConn)
 ```
 
 ## Loaders

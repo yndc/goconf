@@ -23,6 +23,8 @@ func TestBuilder(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	c := config.Get()
+	c := config.Get().(*data.Types)
 	fmt.Println(c)
+	fmt.Println(config.GetInt("Int16"))
+	fmt.Println(config.GetString("String"))
 }
