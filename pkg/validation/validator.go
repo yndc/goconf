@@ -4,6 +4,10 @@ import (
 	"reflect"
 )
 
+func emptyValidator(value interface{}) error {
+	return nil
+}
+
 // GenerateValidators generates an array of validator function based on the given field type
 func GenerateValidators(fieldType reflect.Type, field reflect.StructField) []ValidationFunction {
 	validators := make([]ValidationFunction, 0)
@@ -20,6 +24,17 @@ func GenerateValidators(fieldType reflect.Type, field reflect.StructField) []Val
 		rule := createFloatBoundaryRuleFromTags(field.Tag)
 		validators = append(validators, rule.CreateValidationFunction())
 	case reflect.String:
+		if format := field.Tag.Get("format"); format != "" {
+			validators = append(validators, createFormatValidationFunction(format))
+		}
+		if pattern := field.Tag.Get("pattern"); pattern != "" {
+			validators = append(validators, createPatternValidationFunction(pattern))
+		}
+
+		lengthRule := createStringLengthRuleFromTags(field.Tag)
+		if lengthRule.Flags > 0 {
+			validators = append(validators, lengthRule.CreateValidationFunction())
+		}
 	}
 	return validators
 }

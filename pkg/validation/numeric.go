@@ -22,8 +22,7 @@ type IntBoundaryRule struct {
 }
 
 func (b *IntBoundaryRule) SetMin(value int64, exclusive bool) {
-	b.Flags |= NumericBoundaryMin
-	if value < b.Min {
+	if value > b.Min || !b.Flags.Has(NumericBoundaryMin) {
 		b.Min = value
 		if exclusive {
 			b.Flags |= NumericBoundaryExclusiveMin
@@ -31,11 +30,11 @@ func (b *IntBoundaryRule) SetMin(value int64, exclusive bool) {
 	} else if value == b.Min && exclusive {
 		b.Flags |= NumericBoundaryExclusiveMin
 	}
+	b.Flags |= NumericBoundaryMin
 }
 
 func (b *IntBoundaryRule) SetMax(value int64, exclusive bool) {
-	b.Flags |= NumericBoundaryMax
-	if value > b.Max {
+	if value < b.Max || !b.Flags.Has(NumericBoundaryMax) {
 		b.Max = value
 		if exclusive {
 			b.Flags |= NumericBoundaryExclusiveMax
@@ -43,6 +42,7 @@ func (b *IntBoundaryRule) SetMax(value int64, exclusive bool) {
 	} else if value == b.Max && exclusive {
 		b.Flags |= NumericBoundaryExclusiveMax
 	}
+	b.Flags |= NumericBoundaryMax
 }
 
 func (b *IntBoundaryRule) CreateValidationFunction() ValidationFunction {
@@ -98,8 +98,7 @@ type UintBoundaryRule struct {
 }
 
 func (b *UintBoundaryRule) SetMin(value uint64, exclusive bool) {
-	b.Flags |= NumericBoundaryMin
-	if value < b.Min {
+	if value > b.Min || !b.Flags.Has(NumericBoundaryMin) {
 		b.Min = value
 		if exclusive {
 			b.Flags |= NumericBoundaryExclusiveMin
@@ -107,11 +106,11 @@ func (b *UintBoundaryRule) SetMin(value uint64, exclusive bool) {
 	} else if value == b.Min && exclusive {
 		b.Flags |= NumericBoundaryExclusiveMin
 	}
+	b.Flags |= NumericBoundaryMin
 }
 
 func (b *UintBoundaryRule) SetMax(value uint64, exclusive bool) {
-	b.Flags |= NumericBoundaryMax
-	if value > b.Max {
+	if value < b.Max || !b.Flags.Has(NumericBoundaryMax) {
 		b.Max = value
 		if exclusive {
 			b.Flags |= NumericBoundaryExclusiveMax
@@ -119,6 +118,7 @@ func (b *UintBoundaryRule) SetMax(value uint64, exclusive bool) {
 	} else if value == b.Max && exclusive {
 		b.Flags |= NumericBoundaryExclusiveMax
 	}
+	b.Flags |= NumericBoundaryMax
 }
 
 func (b *UintBoundaryRule) CreateValidationFunction() ValidationFunction {
@@ -174,8 +174,7 @@ type FloatBoundaryRule struct {
 }
 
 func (b *FloatBoundaryRule) SetMin(value float64, exclusive bool) {
-	b.Flags |= NumericBoundaryMin
-	if value < b.Min {
+	if value > b.Min || !b.Flags.Has(NumericBoundaryMin) {
 		b.Min = value
 		if exclusive {
 			b.Flags |= NumericBoundaryExclusiveMin
@@ -183,11 +182,11 @@ func (b *FloatBoundaryRule) SetMin(value float64, exclusive bool) {
 	} else if value == b.Min && exclusive {
 		b.Flags |= NumericBoundaryExclusiveMin
 	}
+	b.Flags |= NumericBoundaryMin
 }
 
 func (b *FloatBoundaryRule) SetMax(value float64, exclusive bool) {
-	b.Flags |= NumericBoundaryMax
-	if value > b.Max {
+	if value < b.Max || !b.Flags.Has(NumericBoundaryMax) {
 		b.Max = value
 		if exclusive {
 			b.Flags |= NumericBoundaryExclusiveMax
@@ -195,6 +194,7 @@ func (b *FloatBoundaryRule) SetMax(value float64, exclusive bool) {
 	} else if value == b.Max && exclusive {
 		b.Flags |= NumericBoundaryExclusiveMax
 	}
+	b.Flags |= NumericBoundaryMax
 }
 
 func (b *FloatBoundaryRule) CreateValidationFunction() ValidationFunction {

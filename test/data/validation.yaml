@@ -75,3 +75,6 @@ strurl_ok7: /other/link.html
 strurl_x__: asdasd
 strurl_x2_: 34235
 strurl_x3_: example.com
+
+# pattern
+strpattern_ok_: 555-1212
