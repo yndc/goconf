@@ -26,7 +26,14 @@ func (c *Config) GetAll() interface{} {
 func (c *Config) Get(key string) interface{} {
 	c.mut.RLock()
 	defer c.mut.RUnlock()
-	return c.values[key]
+	if v, ok := c.values[key]; ok {
+		return v
+	}
+	v, _ := utils.GetStructValue(c.value, utils.Parse(key))
+	if v.Kind() != reflect.Invalid {
+		return v.Interface()
+	}
+	return nil
 }
 
 func (c *Config) GetInt(key string) int64 {

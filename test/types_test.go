@@ -24,7 +24,9 @@ func TestBuilder(t *testing.T) {
 	}
 
 	c := config.GetAll().(*data.Types)
+	s := config.Get("Struct").(data.Struct)
 	fmt.Println(c)
+	fmt.Println(s)
 	fmt.Println(config.GetInt("Int16"))
 	fmt.Println(config.GetString("String"))
 }

@@ -1,6 +1,10 @@
 # recon
 
-Short for reactive config. A library for managing and validating configuration files for Go. Supports loading configuration from files (JSON and YAML), SQL database, and REST API endpoints. Supports caching with redis.
+Short for reactive config. A library for managing and validating configuration files for Go. Supports loading configuration from files (JSON and YAML), SQL database, and REST API endpoints.
+
+### Status
+
+Currently this library is still experimental. Not all features has been implemented and expect crashes and failures.
 
 ## Usage
 
