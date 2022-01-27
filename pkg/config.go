@@ -1,6 +1,8 @@
 package recon
 
 import (
+	"sync"
+
 	"github.com/yndc/recon/pkg/schema"
 )
 
@@ -11,4 +13,5 @@ type Config struct {
 	schema            schema.Schema
 	onValidationError func(key string, value interface{}, err error)
 	onLoaded          func(key string, value interface{})
+	mut               sync.RWMutex
 }

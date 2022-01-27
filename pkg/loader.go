@@ -38,6 +38,8 @@ func (c *Config) LoadValue(key string, value interface{}) error {
 }
 
 func (c *Config) loadValue(value interface{}, at *utils.Path) error {
+	c.mut.Lock()
+	defer c.mut.Unlock()
 	if value == nil {
 		return nil
 	}
