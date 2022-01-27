@@ -1,1 +1,8 @@
-exist: value
+int8: 24
+int64: -235223456
+UInt8: 213
+Int: -152668
+IntPtr: -35
+UInt: 87
+UIntPtr: 3225
+Float32: 23452.87

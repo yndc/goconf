@@ -24,6 +24,10 @@ func (f *FieldSchema) Validate(value interface{}) error {
 	return nil
 }
 
+func (f *FieldSchema) GetDefaultValue() interface{} {
+	return f.defaultValue
+}
+
 func (f *FieldSchema) GetType() reflect.Type {
 	return f.valueType
 }

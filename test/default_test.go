@@ -8,9 +8,9 @@ import (
 	"github.com/yndc/recon/test/data"
 )
 
-func TestBuilder(t *testing.T) {
-	builder := recon.New(&data.Types{})
-	builder.FromFile("./data/types.yaml", recon.CamelCaseMapper)
+func TestDefaults(t *testing.T) {
+	builder := recon.New(&data.Defaults{})
+	builder.FromFile("./data/defaults.yaml", recon.CamelCaseMapper)
 	builder.OnLoaded(func(key string, value interface{}) {
 		fmt.Printf("loaded %s: %v\n", key, value)
 	})
@@ -23,8 +23,7 @@ func TestBuilder(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	c := config.GetAll().(*data.Types)
+	c := config.GetAll().(*data.Defaults)
 	fmt.Println(c)
-	fmt.Println(config.GetInt("Int16"))
 	fmt.Println(config.GetString("String"))
 }

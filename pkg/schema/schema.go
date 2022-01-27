@@ -12,6 +12,10 @@ type Schema struct {
 	requiredFields []*utils.Path
 }
 
+func (s *Schema) GetAllFieldSchemas() map[string]FieldSchema {
+	return s.fields
+}
+
 func (s *Schema) GetType() reflect.Type {
 	return s.valueType
 }

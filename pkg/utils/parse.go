@@ -6,6 +6,13 @@ import (
 )
 
 func ForceConvert(original interface{}, fieldType reflect.Type) interface{} {
+	for {
+		if fieldType.Kind() == reflect.Ptr {
+			fieldType = fieldType.Elem()
+		} else {
+			break
+		}
+	}
 	switch value := original.(type) {
 	case string:
 		switch fieldType.Kind() {

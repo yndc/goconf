@@ -38,12 +38,15 @@ func (c *Config) LoadValue(key string, value interface{}) error {
 }
 
 func (c *Config) loadValue(value interface{}, at *utils.Path) error {
+	if value == nil {
+		return nil
+	}
 	key := at.String()
 	fieldSchema := c.schema.GetFieldSchema(at)
 	if fieldSchema != nil {
 		reflectValue := reflect.ValueOf(value)
 		if !utils.AbleToConvert(reflectValue, fieldSchema.GetType()) {
-			return c.handleLoadError(key, value, fmt.Errorf("type mismatch, expecting %s received %s", fieldSchema.GetType(), reflectValue.Type()))
+			return c.handleLoadError(key, value, fmt.Errorf("type mismatch, expecting %v received %v for key %s", fieldSchema, reflectValue, at.String()))
 		}
 		err := fieldSchema.Validate(value)
 		if err != nil {

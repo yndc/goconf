@@ -49,6 +49,14 @@ func (b *Builder) Build() (*Config, error) {
 		b.onLoaded = func(key string, value interface{}) {}
 	}
 
+	// add the default loader as the first loader
+	b.loaders = append([]Loader{
+		DefaultLoader{
+			schema:        schema,
+			valuesHandler: b.config.LoadMap,
+		}}, b.loaders...,
+	)
+
 	// load all values from all loaders
 	for _, loader := range b.loaders {
 		loader.Load()
