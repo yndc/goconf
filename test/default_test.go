@@ -26,4 +26,6 @@ func TestDefaults(t *testing.T) {
 	c := config.GetAll().(*data.Defaults)
 	fmt.Println(c)
 	fmt.Println(config.GetString("String"))
+
+	fmt.Println(builder.Get())
 }

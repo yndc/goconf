@@ -32,6 +32,13 @@ func (b *Builder) FromFile(path string, mapper KeyMapper) *Builder {
 	return b
 }
 
+// build and load the configuration and returns the constructed configuration object without the container
+// using this method will disable all config reloading features
+func (b *Builder) Get() (interface{}, error) {
+	config, err := b.Build()
+	return config.value, err
+}
+
 // build into a config container
 func (b *Builder) Build() (*Config, error) {
 	// build the schema
