@@ -6,37 +6,33 @@ import (
 
 	"github.com/yndc/recon/pkg/schema"
 	"github.com/yndc/recon/pkg/utils"
+	"github.com/yndc/recon/pkg/validation"
 )
 
 type Builder struct {
-	loaders           []Loader
+	sources           []Loader
 	config            *Config
 	onValidationError func(key string, value interface{}, err error)
 	onLoaded          func(key string, value interface{})
 }
 
 // create a new config builder
-func New(sample interface{}) *Builder {
+func New() *Builder {
 	return &Builder{
-		loaders: make([]Loader, 0),
+		sources: make([]Loader, 0),
 		config: &Config{
-			value:  sample,
-			values: make(map[string]interface{}),
+			values: make(map[string]InterfaceValue),
 		},
 	}
 }
 
+// add an interface field to the schema
+func (b *Builder) Interface(key string)
+
 // add a file loader to the config builder
 func (b *Builder) FromFile(path string, mapper KeyMapper) *Builder {
-	b.loaders = append(b.loaders, NewFileLoader(path, mapper, b.config.LoadMap))
+	b.sources = append(b.sources, NewFileLoader(path, mapper, b.config.LoadMap))
 	return b
-}
-
-// build and load the configuration and returns the constructed configuration object without the container
-// using this method will disable all config reloading features
-func (b *Builder) Get() (interface{}, error) {
-	config, err := b.Build()
-	return config.value, err
 }
 
 // build into a config container
@@ -57,15 +53,15 @@ func (b *Builder) Build() (*Config, error) {
 	}
 
 	// add the default loader as the first loader
-	b.loaders = append([]Loader{
+	b.sources = append([]Loader{
 		DefaultLoader{
 			schema:        schema,
 			valuesHandler: b.config.LoadMap,
-		}}, b.loaders...,
+		}}, b.sources...,
 	)
 
 	// load all values from all loaders
-	for _, loader := range b.loaders {
+	for _, loader := range b.sources {
 		loader.Load()
 	}
 
@@ -80,4 +76,31 @@ func (b *Builder) Build() (*Config, error) {
 	}
 
 	return b.config, nil
+}
+
+type InterfaceSchemaBuilder struct {
+	key        string
+	builder    *Builder
+	validators []validation.ValidationFunction
+}
+
+func (b *InterfaceSchemaBuilder) Required() *InterfaceSchemaBuilder {
+	b.builder.config.requiredFields.Add(b.key)
+	return b
+}
+
+func (b *InterfaceSchemaBuilder) Validation(fn validation.ValidationFunction) *InterfaceSchemaBuilder {
+	if b.validators != nil {
+		b.validators = append(b.validators)
+	} else {
+		b.validators = []validation.ValidationFunction{fn}
+	}
+	return b
+}
+
+func (b *InterfaceSchemaBuilder) Build() *Builder {
+	b.builder.config.schema[b.key] = schema.FieldSchema{}
+}
+
+type IntSchemaBuilder struct {
 }
