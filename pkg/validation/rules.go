@@ -30,3 +30,7 @@ type Rule struct {
 }
 
 type ValidationFunction func(value interface{}) error
+
+type IntValidationFunction func(value int) error
+
+type StringValidationFunction func(value string) error

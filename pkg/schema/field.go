@@ -39,3 +39,43 @@ func (f *FieldSchema) Required() bool {
 func (f *FieldSchema) IsArray() bool {
 	return f.valueType.Kind() == reflect.Slice
 }
+
+type Schema interface {
+	GetKind() reflect.Kind
+}
+
+type InterfaceSchema struct {
+	defaultValue interface{}
+	validators   []validation.ValidationFunction
+}
+
+func (s *InterfaceSchema) GetKind() reflect.Kind {
+	return reflect.Interface
+}
+
+type IntSchema struct {
+	defaultValue int64
+	validators   []validation.ValidationFunction
+}
+
+func (s *IntSchema) GetKind() reflect.Kind {
+	return reflect.Int64
+}
+
+type UintSchema struct {
+	defaultValue uint64
+	validators   []validation.ValidationFunction
+}
+
+func (s *UintSchema) GetKind() reflect.Kind {
+	return reflect.Uint64
+}
+
+type StringSchema struct {
+	defaultValue string
+	validators   []validation.StringValidationFunction
+}
+
+func (s *StringSchema) GetKind() reflect.Kind {
+	return reflect.String
+}

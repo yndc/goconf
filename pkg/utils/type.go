@@ -29,65 +29,9 @@ func GetElemType(val reflect.Value) reflect.Type {
 	}
 }
 
-func AbleToConvert(from reflect.Value, to reflect.Type) bool {
-
-	// handle pointers
-	if to.Kind() == reflect.Ptr {
-		to = to.Elem()
-	}
-	if from.Kind() == reflect.Ptr {
-		from = from.Elem()
-	}
-
-	// handle arrays
-	if from.Kind() == reflect.Slice {
-		if from.Len() == 0 {
-			return true
-		}
-		if to.Kind() == reflect.Slice {
-			for i := 0; i < from.Len(); i++ {
-				if !AbleToConvert(from.Index(0), to.Elem()) {
-					return false
-				}
-			}
-			return true
-		} else {
-			return false
-		}
-	}
-
-	// handle interfaces
-	if from.Kind() == reflect.Interface {
-		from = from.Elem()
-	}
-
-	// handle maps
-	if from.Kind() == reflect.Map {
-		if to.Kind() == reflect.Map {
-			return true
-		}
-		if to.Kind() != reflect.Struct {
-			return false
-		}
-
-		iter := from.MapRange()
-		for iter.Next() {
-			k := iter.Key()
-			v := iter.Value()
-			if k.Kind() == reflect.String {
-				name := k.Interface().(string)
-				if toField, ok := to.FieldByName(name); ok {
-					if !AbleToConvert(v, toField.Type) {
-						return false
-					}
-				}
-			}
-		}
-		return true
-	}
-
+func CanConvert(from reflect.Value, to reflect.Kind) bool {
 	standarisedOriginal := StandariseKind(from.Kind())
-	standarisedDestination := StandariseKind(to.Kind())
+	standarisedDestination := StandariseKind(to)
 	if standarisedOriginal == standarisedDestination {
 		return true
 	}
