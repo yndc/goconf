@@ -9,7 +9,7 @@ type Loader interface {
 	Load() error
 }
 
-type ValuesHandler func(values map[string]interface{}) map[string]error
+type ValuesHandler func(values SetCommand) map[string]error
 
 func (c *Config) handleLoadError(key string, value interface{}, err error) error {
 	if c.onValidationError != nil {

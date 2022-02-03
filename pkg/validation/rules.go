@@ -28,9 +28,3 @@ type Rule struct {
 	Type     uint
 	Function int
 }
-
-type ValidationFunction func(value interface{}) error
-
-type IntValidationFunction func(value int) error
-
-type StringValidationFunction func(value string) error

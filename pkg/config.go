@@ -9,7 +9,8 @@ import (
 
 // Config is the configuration container
 type Config struct {
-	values            map[string]ConfigValue
+	values            map[string]ConfigValueWrapper
+	sources           []Source
 	onValidationError func(key string, value interface{}, err error)
 	onLoaded          func(key string, value interface{})
 	requiredFields    utils.Set
@@ -20,7 +21,7 @@ type Config struct {
 func (c *Config) Set(values SetCommand) map[string]error {
 	errors := make(map[string]error)
 	for k, v := range values {
-		err := c.loadValue(v, utils.Parse(k))
+		err := c.setValue(k, v)
 		if err != nil {
 			errors[k] = err
 		}
@@ -32,7 +33,7 @@ func (c *Config) Set(values SetCommand) map[string]error {
 // If any of the field validation fails, the values will not be set
 func (c *Config) SetAsTransaction(values SetCommand) error {
 	for k, v := range values {
-		err := c.loadValue(k, v)
+		err := c.setValue(k, v)
 		if err != nil {
 			return err
 		}
@@ -40,27 +41,28 @@ func (c *Config) SetAsTransaction(values SetCommand) error {
 	return nil
 }
 
-func (c *Config) loadValue(key string, value interface{}) error {
+func (c *Config) setValue(key string, value interface{}) error {
 	if value == nil {
 		return nil
 	}
 	if configValue, ok := c.values[key]; ok {
-		schema := configValue.GetSchema()
-		reflectValue := reflect.ValueOf(value)
-		if !utils.CanConvert(reflectValue, schema.GetKind()) {
-			return c.handleLoadError(key, value, fmt.Errorf("type mismatch, expecting %v received %v for key %s", schema, reflectValue, at.String()))
-		}
-		err := schema.Validate(value)
-		if err != nil {
-			return c.handleLoadError(key, value, err)
-		}
 
-		value, err = utils.SetStructValue(c.value, at, value)
-		if err != nil {
-			return c.handleLoadError(key, value, err)
+		switch c := configValue.(type) {
+		case ConfigValue[string]:
+			v, ok := utils.TryConvertString(value)
+			if !ok {
+				return fmt.Errorf("type mismatch, expecting string received %v for key %s", reflect.ValueOf(value).Kind(), key)
+			}
+			return c.Set(v)
+		case ConfigValue[int64]:
+			v, ok := utils.TryConvertInt(value)
+			if !ok {
+				return fmt.Errorf("type mismatch, expecting string received %v for key %s", reflect.ValueOf(value).Kind(), key)
+			}
+			return c.Set(v)
+		default:
+			return fmt.Errorf("unsupported type")
 		}
-		c.values[at.String()] = unwrapPtr(value)
-		c.handleLoad(key, value)
 	}
 	return nil
 }

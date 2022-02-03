@@ -33,16 +33,15 @@ func (b *StringLengthRule) SetMax(value int) {
 	b.Flags |= StringLengthBoundaryMax
 }
 
-func (b *StringLengthRule) CreateValidationFunction() ValidationFunction {
-	return func(value interface{}) error {
-		v := value.(string)
+func (b *StringLengthRule) CreateValidationFunction() Validator[string] {
+	return func(value string) error {
 		if b.Flags.Has(NumericBoundaryMin) {
-			if len(v) < b.Min {
+			if len(value) < b.Min {
 				return fmt.Errorf("string length is less than the minimum length (%d)", b.Min)
 			}
 		}
 		if b.Flags.Has(NumericBoundaryMax) {
-			if len(v) > b.Max {
+			if len(value) > b.Max {
 				return fmt.Errorf("string length is greater than the maximum length (%d)", b.Max)
 			}
 		}

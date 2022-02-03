@@ -3,48 +3,30 @@ package recon
 import (
 	"sync"
 
-	"github.com/yndc/recon/pkg/schema"
 	"github.com/yndc/recon/pkg/validation"
 )
 
-type ConfigValue interface {
-	GetSchema() schema.Schema
-}
+type ConfigValueWrapper interface{}
 
-type InterfaceValue struct {
+type ConfigValue[T validation.ValueType] struct {
 	mutex        sync.RWMutex
-	value        interface{}
-	defaultValue interface{}
-	validators   validation.ValidationFunction
+	value        T
+	defaultValue *T
+	validators   validation.Validators[T]
 }
 
-func (c *InterfaceValue) Get() interface{} {
+func (c *ConfigValue[T]) Get() interface{} {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
 	return c.value
 }
 
-func (c *InterfaceValue) Set(v interface{}) {
+func (c *ConfigValue[T]) Set(v T) error {
+	if err := c.validators.Validate(v); err != nil {
+		return err
+	}
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 	c.value = v
-}
-
-type StringValue struct {
-	mutex        sync.RWMutex
-	value        string
-	defaultValue string
-	validators   []validation.StringValidationFunction
-}
-
-func (c *StringValue) Get() string {
-	c.mutex.RLock()
-	defer c.mutex.RUnlock()
-	return c.value
-}
-
-func (c *StringValue) Set(v string) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-	c.value = v
+	return nil
 }

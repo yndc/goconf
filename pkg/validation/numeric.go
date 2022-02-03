@@ -45,27 +45,26 @@ func (b *IntBoundaryRule) SetMax(value int64, exclusive bool) {
 	b.Flags |= NumericBoundaryMax
 }
 
-func (b *IntBoundaryRule) CreateValidationFunction() ValidationFunction {
-	return func(value interface{}) error {
-		v := utils.ForceInt64(value)
+func (b *IntBoundaryRule) CreateValidator() Validator[int64] {
+	return func(value int64) error {
 		if b.Flags.Has(NumericBoundaryMin) {
 			if b.Flags.Has(NumericBoundaryExclusiveMin) {
-				if v <= b.Min {
+				if value <= b.Min {
 					return fmt.Errorf("value is less than or equal to the minimum value (%d)", b.Min)
 				}
 			} else {
-				if v < b.Min {
+				if value < b.Min {
 					return fmt.Errorf("value is less than the minimum value (%d)", b.Min)
 				}
 			}
 		}
 		if b.Flags.Has(NumericBoundaryMax) {
 			if b.Flags.Has(NumericBoundaryExclusiveMax) {
-				if v >= b.Max {
+				if value >= b.Max {
 					return fmt.Errorf("value is greater than or equal to the maximum value (%d)", b.Max)
 				}
 			} else {
-				if v > b.Max {
+				if value > b.Max {
 					return fmt.Errorf("value is greater than the maximum value (%d)", b.Max)
 				}
 			}
@@ -121,27 +120,26 @@ func (b *UintBoundaryRule) SetMax(value uint64, exclusive bool) {
 	b.Flags |= NumericBoundaryMax
 }
 
-func (b *UintBoundaryRule) CreateValidationFunction() ValidationFunction {
-	return func(value interface{}) error {
-		v := utils.ForceUint64(value)
+func (b *UintBoundaryRule) CreateValidator() Validator[uint64] {
+	return func(value uint64) error {
 		if b.Flags.Has(NumericBoundaryMin) {
 			if b.Flags.Has(NumericBoundaryExclusiveMin) {
-				if v <= b.Min {
+				if value <= b.Min {
 					return fmt.Errorf("value is less than or equal to the minimum value (%d)", b.Min)
 				}
 			} else {
-				if v < b.Min {
+				if value < b.Min {
 					return fmt.Errorf("value is less than the minimum value (%d)", b.Min)
 				}
 			}
 		}
 		if b.Flags.Has(NumericBoundaryMax) {
 			if b.Flags.Has(NumericBoundaryExclusiveMax) {
-				if v >= b.Max {
+				if value >= b.Max {
 					return fmt.Errorf("value is greater than or equal to the maximum value (%d)", b.Max)
 				}
 			} else {
-				if v > b.Max {
+				if value > b.Max {
 					return fmt.Errorf("value is greater than the maximum value (%d)", b.Max)
 				}
 			}
@@ -197,27 +195,26 @@ func (b *FloatBoundaryRule) SetMax(value float64, exclusive bool) {
 	b.Flags |= NumericBoundaryMax
 }
 
-func (b *FloatBoundaryRule) CreateValidationFunction() ValidationFunction {
-	return func(value interface{}) error {
-		v := utils.ForceFloat64(value)
+func (b *FloatBoundaryRule) CreateValidationFunction() Validator[float64] {
+	return func(value float64) error {
 		if b.Flags.Has(NumericBoundaryMin) {
 			if b.Flags.Has(NumericBoundaryExclusiveMin) {
-				if v <= b.Min {
+				if value <= b.Min {
 					return fmt.Errorf("value is less than or equal to the minimum value (%f)", b.Min)
 				}
 			} else {
-				if v < b.Min {
+				if value < b.Min {
 					return fmt.Errorf("value is less than the minimum value (%f)", b.Min)
 				}
 			}
 		}
 		if b.Flags.Has(NumericBoundaryMax) {
 			if b.Flags.Has(NumericBoundaryExclusiveMax) {
-				if v >= b.Max {
+				if value >= b.Max {
 					return fmt.Errorf("value is greater than or equal to the maximum value (%f)", b.Max)
 				}
 			} else {
-				if v > b.Max {
+				if value > b.Max {
 					return fmt.Errorf("value is greater than the maximum value (%f)", b.Max)
 				}
 			}
