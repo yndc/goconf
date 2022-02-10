@@ -14,6 +14,12 @@ type Config struct {
 	onValidationError func(key string, value interface{}, err error)
 	onLoaded          func(key string, value interface{})
 	requiredFields    utils.Set
+	setCommands       chan SetCommand
+}
+
+func (c *Config) HasKey(key string) bool {
+	_, ok := c.values[key]
+	return ok
 }
 
 // Set the given values into the config
@@ -46,22 +52,27 @@ func (c *Config) setValue(key string, value interface{}) error {
 		return nil
 	}
 	if configValue, ok := c.values[key]; ok {
-
+		var err error
 		switch c := configValue.(type) {
-		case ConfigValue[string]:
+		case *ConfigValue[string]:
 			v, ok := utils.TryConvertString(value)
 			if !ok {
 				return fmt.Errorf("type mismatch, expecting string received %v for key %s", reflect.ValueOf(value).Kind(), key)
 			}
-			return c.Set(v)
-		case ConfigValue[int64]:
+			err = c.Set(v)
+		case *ConfigValue[int64]:
 			v, ok := utils.TryConvertInt(value)
 			if !ok {
 				return fmt.Errorf("type mismatch, expecting string received %v for key %s", reflect.ValueOf(value).Kind(), key)
 			}
-			return c.Set(v)
+			err = c.Set(v)
 		default:
 			return fmt.Errorf("unsupported type")
+		}
+		if err != nil {
+			c.onValidationError(key, value, err)
+		} else {
+			c.onLoaded(key, value)
 		}
 	}
 	return nil

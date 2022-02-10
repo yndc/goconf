@@ -1,6 +1,9 @@
 package recon
 
 type Source interface {
-	// Get all values from this source
-	GetAll() SetCommand
+	// Load all values from this source
+	LoadAll() error
+
+	// Register the source
+	Register(setterFn func(values SetCommand) map[string]error)
 }

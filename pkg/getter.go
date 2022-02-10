@@ -15,7 +15,7 @@ func (c *Config) Get(key string) ConfigValueWrapper {
 func (c *Config) GetInt(key string) int64 {
 	v := c.Get(key)
 	if v != nil {
-		return v.(ConfigValue[int64]).value
+		return v.(*ConfigValue[int64]).value
 	}
 	return 0
 }
@@ -23,7 +23,7 @@ func (c *Config) GetInt(key string) int64 {
 func (c *Config) GetUint(key string) uint64 {
 	v := c.Get(key)
 	if v != nil {
-		return v.(ConfigValue[uint64]).value
+		return v.(*ConfigValue[uint64]).value
 	}
 	return 0
 }
@@ -31,7 +31,7 @@ func (c *Config) GetUint(key string) uint64 {
 func (c *Config) GetFloat(key string) float64 {
 	v := c.Get(key)
 	if v != nil {
-		return v.(ConfigValue[float64]).value
+		return v.(*ConfigValue[float64]).value
 	}
 	return 0
 }
@@ -39,7 +39,7 @@ func (c *Config) GetFloat(key string) float64 {
 func (c *Config) GetString(key string) string {
 	v := c.Get(key)
 	if v != nil {
-		return v.(ConfigValue[string]).value
+		return v.(*ConfigValue[string]).value
 	}
 	return ""
 }
@@ -47,7 +47,7 @@ func (c *Config) GetString(key string) string {
 func (c *Config) GetBool(key string) bool {
 	v := c.Get(key)
 	if v != nil {
-		return v.(ConfigValue[bool]).value
+		return v.(*ConfigValue[bool]).value
 	}
 	return false
 }
@@ -55,7 +55,7 @@ func (c *Config) GetBool(key string) bool {
 func (c *Config) GetStringArray(key string) []string {
 	v := c.Get(key)
 	if v != nil {
-		return v.(ConfigValue[[]string]).value
+		return v.(*ConfigValue[[]string]).value
 	}
 	return nil
 }
@@ -63,7 +63,7 @@ func (c *Config) GetStringArray(key string) []string {
 func (c *Config) TryGet(key string) (ConfigValueWrapper, error) {
 	v := c.Get(key)
 	if v == nil {
-		return "", fmt.Errorf("value is not set", key)
+		return nil, fmt.Errorf("value is not set", key)
 	}
 	return v, nil
 }
@@ -73,7 +73,7 @@ func (c *Config) TryGetString(key string) (string, error) {
 	if v == nil {
 		return "", fmt.Errorf("value is not set", key)
 	}
-	if v, ok := v.(ConfigValue[string]); ok {
+	if v, ok := v.(*ConfigValue[string]); ok {
 		return v.value, nil
 	} else {
 		return "", fmt.Errorf("type mismatch")

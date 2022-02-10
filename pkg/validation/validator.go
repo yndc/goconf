@@ -15,7 +15,7 @@ func (v *Validators[T]) Validate(value T) error {
 	return nil
 }
 
-func (v *Validators[T]) AddValidator(fn Validator[T]) {
+func (v *Validators[T]) AddValidator(fn func(value T) error) {
 	v.validators = append(v.validators, fn)
 }
 

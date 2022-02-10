@@ -9,7 +9,7 @@ import (
 )
 
 type Builder struct {
-	config            *Config
+	Config
 	onValidationError func(key string, value interface{}, err error)
 	onLoaded          func(key string, value interface{})
 }
@@ -17,30 +17,18 @@ type Builder struct {
 // create a new config builder
 func New() *Builder {
 	return &Builder{
-		config: &Config{
-			sources: make([]Source, 0),
-			values:  make(map[string]ConfigValueWrapper),
+		Config: Config{
+			sources:        make([]Source, 0),
+			values:         make(map[string]ConfigValueWrapper),
+			setCommands:    make(chan SetCommand),
+			requiredFields: *utils.NewSet(0),
 		},
-	}
-}
-
-// add an string field to the schema
-func (b *Builder) String(key string) SchemaBuilder[string] {
-	if _, exists := b.config.values[key]; exists {
-		panic("key already exists")
-	}
-	b.config.values[key] = ConfigValue[string]{
-		validators: validation.NewValidators[string](),
-	}
-	return SchemaBuilder[string]{
-		builder: b,
-		key:     key,
 	}
 }
 
 // add a source
 func (b *Builder) AddSource(source Source) *Builder {
-	b.config.sources = append(b.config.sources, source)
+	b.Config.sources = append(b.Config.sources, source)
 	return b
 }
 
@@ -56,19 +44,33 @@ func (b *Builder) Build() (*Config, error) {
 	}
 
 	// load all values from all loaders
-	for _, loader := range b.config.sources {
-		loader.GetAll()
+	for _, source := range b.Config.sources {
+		source.Register(b.Config.Set)
+		source.LoadAll()
 	}
 
 	// ensure that the required fields are all filled
-	requiredFields := utils.NewSetWithValues(b.config.requiredFields.Values()...)
-	for key := range b.config.values {
-		requiredFields.Remove(key)
+	requiredFields := utils.NewSetWithValues(b.Config.requiredFields.Values()...)
+	for key, value := range b.Config.values {
+		if value.IsSet() {
+			requiredFields.Remove(key)
+		}
 	}
 
 	if requiredFields.Count() > 0 {
 		return nil, fmt.Errorf("failed to build config, not all required fields are set: %s", strings.Join(requiredFields.Values(), ", "))
 	}
 
-	return b.config, nil
+	return &b.Config, nil
+}
+
+func addNewField[T validation.ValueType](builder *Builder, key string) *ConfigValue[T] {
+	if builder.Config.HasKey(key) {
+		panic("key already exists")
+	}
+	value := &ConfigValue[T]{
+		validators: validation.NewValidators[T](),
+	}
+	builder.Config.values[key] = value
+	return value
 }

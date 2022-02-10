@@ -5,67 +5,77 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/yndc/recon/pkg/utils"
 	"gopkg.in/yaml.v2"
 )
 
-type FileLoader struct {
-	path          string
-	valuesHandler ValuesHandler
-	keyMapper     KeyMapper
+type FileSource struct {
+	path      string
+	setter    func(values SetCommand) map[string]error
+	keyMapper KeyMapper
 }
 
-func NewFileLoader(path string, mapper KeyMapper, valuesHandler ValuesHandler) *FileLoader {
+func NewFileSource(path string, mapper KeyMapper) *FileSource {
 	if mapper == nil {
 		mapper = DefaultMapper
 	}
-	return &FileLoader{
-		path:          path,
-		valuesHandler: valuesHandler,
-		keyMapper:     mapper,
+	return &FileSource{
+		path:      path,
+		keyMapper: mapper,
 	}
 }
 
-func (l FileLoader) Load() error {
+func (l *FileSource) Register(setter func(values SetCommand) map[string]error) {
+	l.setter = setter
+}
+
+func (l *FileSource) LoadAll() error {
 	values, err := l.loadFileToMap(l.path)
 	if err != nil {
 		return err
 	}
-	l.valuesHandler(values)
+	l.setter(values)
 	return nil
 }
 
-func (l FileLoader) loadFileToMap(path string) (map[string]interface{}, error) {
+func (l *FileSource) loadFileToMap(path string) (map[string]interface{}, error) {
 	raw, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 
 	ext := getFileExtension(path)
+	var loaded map[string]interface{}
 	switch ext {
 	case "yaml", "yml":
-		return l.loadYaml(raw)
+		loaded, err = l.loadYaml(raw)
 	case "json":
-		return l.loadJson(raw)
+		loaded, err = l.loadJson(raw)
+	default:
+		return nil, fmt.Errorf("unsupported file format: %s", ext)
 	}
 
-	return nil, fmt.Errorf("unsupported file format: %s", ext)
+	if err != nil {
+		return nil, err
+	}
+
+	mappedKeys := make(map[string]interface{}, len(loaded))
+	for k, v := range loaded {
+		mappedKeys[l.keyMapper(k)] = v
+	}
+
+	return mappedKeys, nil
 }
 
-func (l FileLoader) loadYaml(source []byte) (map[string]interface{}, error) {
+func (l *FileSource) loadYaml(source []byte) (map[string]interface{}, error) {
 	var values map[string]interface{}
 	err := yaml.Unmarshal(source, &values)
 	if err != nil {
 		return nil, err
 	}
-	result := make(map[string]interface{}, len(values))
-	utils.TraverseMap(values, func(path *utils.Path, value interface{}) {
-		result[path.Map(l.keyMapper).String()] = value
-	})
-	return result, err
+	return values, err
 }
 
-func (l FileLoader) loadJson(source []byte) (map[string]interface{}, error) {
+func (l *FileSource) loadJson(source []byte) (map[string]interface{}, error) {
 	var result map[string]interface{}
 	err := yaml.Unmarshal(source, &result)
 	return result, err

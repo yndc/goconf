@@ -5,12 +5,11 @@ import (
 	"testing"
 
 	recon "github.com/yndc/recon/pkg"
-	"github.com/yndc/recon/test/data"
 )
 
 func TestBuilder(t *testing.T) {
-	builder := recon.New(&data.Types{})
-	builder.FromFile("./data/types.yaml", recon.CamelCaseMapper)
+	builder := recon.New()
+	builder.AddSource(recon.NewFileSource("./data/types.yaml", recon.DefaultMapper))
 	builder.OnLoaded(func(key string, value interface{}) {
 		fmt.Printf("loaded %s: %v\n", key, value)
 	})
@@ -18,15 +17,16 @@ func TestBuilder(t *testing.T) {
 		fmt.Printf("validation error %s with value %v: %v\n", key, value, err)
 	})
 
+	builder.String("string").Required().Build()
+	builder.String("other").Build()
+
+	builder.Int("int")
+
 	config, err := builder.Build()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	c := config.GetAll().(*data.Types)
-	s := config.Get("Struct").(data.Struct)
-	fmt.Println(c)
-	fmt.Println(s)
-	fmt.Println(config.GetInt("Int16"))
-	fmt.Println(config.GetString("String"))
+	fmt.Println(config.GetString("string"))
+	fmt.Println(config.GetString("other"))
 }

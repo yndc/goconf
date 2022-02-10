@@ -2,6 +2,13 @@ package recon
 
 import "github.com/yndc/recon/pkg/validation"
 
+type ISchemaBuilder[T validation.ValueType] interface {
+	Required() ISchemaBuilder[T]
+	AddValidation(fn validation.Validator[T]) ISchemaBuilder[T]
+	Default(T) ISchemaBuilder[T]
+	Build() *Builder
+}
+
 type SchemaBuilder[T validation.ValueType] struct {
 	key     string
 	builder *Builder
@@ -10,19 +17,19 @@ type SchemaBuilder[T validation.ValueType] struct {
 
 // Mark this field as required
 func (b *SchemaBuilder[T]) Required() *SchemaBuilder[T] {
-	b.builder.config.requiredFields.Add(b.key)
+	b.builder.Config.requiredFields.Add(b.key)
 	return b
 }
 
 // Add a custom validation function for this field
-func (b *SchemaBuilder[T]) Validation(fn validation.Validator[T]) *SchemaBuilder[T] {
+func (b *SchemaBuilder[T]) AddValidation(fn validation.Validator[T]) *SchemaBuilder[T] {
 	b.value.validators.AddValidator(fn)
 	return b
 }
 
 // Default sets the default value of this field
 func (b *SchemaBuilder[T]) Default(value T) *SchemaBuilder[T] {
-	b.builder.config.requiredFields.Add(b.key)
+	b.builder.Config.requiredFields.Add(b.key)
 	b.value.defaultValue = &value
 	return b
 }
